@@ -77,6 +77,8 @@ class SelectorBIC(ModelSelector):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
         # TODO implement model selection based on BIC scores
+        import ipdb
+        ipdb.set_trace()
         raise NotImplementedError
 
 
@@ -103,6 +105,30 @@ class SelectorCV(ModelSelector):
 
     def select(self):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
+        warnings.filterwarnings("ignore")
 
-        # TODO implement model selection using CV
-        raise NotImplementedError
+        try:
+            # Initialize my best score to a really high value
+            best_score, best_model = 99999, None
+
+            # For each number of states make a model
+            for states in range(self.min_n_components, self.max_n_components+1):
+                folds = KFold(n_splits=2)
+                model_scores = []
+
+                for train, test in folds.split(self.sequences):
+                     
+                    self.X, self.lengths = combine_sequences(train, self.sequences)
+                    model = self.base_model(states)
+                    test_X, test_length = combine_sequences(test, self.sequences)
+
+                    model_scores.append(model.score(test_X, test_length))
+
+                if np.mean(model_scores) < best_score:
+                    best_model = model
+                    best_score = np.mean(model_scores)
+            return best_model
+        except :
+            return best_model
+
+
