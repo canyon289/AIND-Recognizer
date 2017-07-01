@@ -109,7 +109,7 @@ class SelectorCV(ModelSelector):
 
         try:
             # Initialize my best score to a really high value
-            best_score, best_model = 99999, None
+            best_score, best_model = -99999, None
 
             # For each number of states make a model
             for states in range(self.min_n_components, self.max_n_components+1):
@@ -124,7 +124,7 @@ class SelectorCV(ModelSelector):
 
                     model_scores.append(model.score(test_X, test_length))
 
-                if np.mean(model_scores) < best_score:
+                if np.mean(model_scores) > best_score:
                     best_model = model
                     best_score = np.mean(model_scores)
             return best_model
