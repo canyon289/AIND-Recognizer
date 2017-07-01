@@ -75,11 +75,24 @@ class SelectorBIC(ModelSelector):
         :return: GaussianHMM object
         """
         warnings.filterwarnings("ignore", category=DeprecationWarning)
+        try:
+            best_score, best_model = 99999, None
 
-        # TODO implement model selection based on BIC scores
-        import ipdb
-        ipdb.set_trace()
-        raise NotImplementedError
+            for states in range(self.min_n_components, self.max_n_components+1):
+                model = self.base_model(states)
+                log_likelihood = model.score(self.X, self.lengths)
+                parameters = states**2 + 2*model.n_features * states - 1
+                bic_score = -2 * log_likelihood + parameters*math.log(len(self.X))
+                
+                if bic_score < best_score:
+                    best_score = bic_score
+                    best_model = model
+
+        except ValueError:
+            pass
+
+        return best_model
+            
 
 
 class SelectorDIC(ModelSelector):
@@ -128,7 +141,8 @@ class SelectorCV(ModelSelector):
                     best_model = model
                     best_score = np.mean(model_scores)
             return best_model
-        except :
-            return best_model
+        except ValueError:
+            pass
 
+        return best_model
 
