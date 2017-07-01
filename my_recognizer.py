@@ -16,10 +16,32 @@ def recognize(models: dict, test_set: SinglesData):
             ]
        guesses is a list of the best guess words ordered by the test set word_id
            ['WORDGUESS0', 'WORDGUESS1', 'WORDGUESS2',...]
-   """
+    """
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     probabilities = []
     guesses = []
-    # TODO implement the recognizer
-    # return probabilities, guesses
-    raise NotImplementedError
+    
+    for testing_word, (X, lengths) in test_set.get_all_Xlengths().items():
+
+        best_score, best_guess = -9999999, None
+        probability_dict = {}
+
+        for model_word, model in models.items():
+        # Try the probablility of all words 
+            try:
+                log_probability = model.score(X, lengths)
+                probability_dict[model_word] = log_probability
+
+            except:
+                probability_dict[model_word] = -9999999
+        
+            # If the probability is higher record as best guess
+            if log_probability > best_score:
+                best_score = log_probability
+                best_guess = model_word 
+
+        # At end of loop add Probability Dictionary and best guess
+        probabilities.append(probability_dict)
+        guesses.append(best_guess)
+
+    return probabilities, guesses
