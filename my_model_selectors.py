@@ -91,7 +91,7 @@ class SelectorBIC(ModelSelector):
         except ValueError:
             pass
 
-        return best_model
+        return self.base_model(self.n_constant)
             
 
 
@@ -131,9 +131,9 @@ class SelectorDIC(ModelSelector):
             return best_model
 
         except ValueError:
-            return best_model
-
-
+            pass
+        return self.base_model(self.n_constant)
+        
 class SelectorCV(ModelSelector):
     ''' select best model based on average log Likelihood of cross-validation folds
 
@@ -164,8 +164,9 @@ class SelectorCV(ModelSelector):
                     best_model = model
                     best_score = np.mean(model_scores)
             return best_model
+
         except ValueError:
             pass
-
-        return best_model
+        return self.base_model(self.n_constant)
+        
 
